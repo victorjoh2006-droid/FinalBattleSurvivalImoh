@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Survival IMOH</title>
+    <style>
+        :root {
+            --primary-red: #ff2e2e;
+            --dark-bg: #000;
+            --card-bg: #111;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('WhatsApp Image 2026-04-02 at 1.17.09 PM.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* Added a shake animation for wrong inputs */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            75% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: var(--primary-red) !important;
+            box-shadow: 0 0 50px rgba(255, 46, 46, 0.5) !important;
+        }
+
+        .login-container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--primary-red);
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(255, 46, 46, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .login-logo {
+            text-align: center;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 11px;
+                color: var(--primary-red);
+                text-transform: uppercase;
+                font-weight: bold;
+                margin-bottom: 8px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 14px;
+                background: #000;
+                border: 1px solid #333;
+                color: white;
+                box-sizing: border-box;
+                outline: none;
+            }
+
+                .form-group input:focus {
+                    border-color: var(--primary-red);
+                }
+
+        #error-msg {
+            background: rgba(255, 46, 46, 0.1);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+            .btn-login:hover {
+                background: white;
+                color: var(--primary-red);
+            }
+
+        .login-footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+        }
+
+            .login-footer a {
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="loginCard">
+        <div class="login-logo">SURVIVAL <span>IMOH</span></div>
+
+        <div id="error-msg">ACCESS DENIED: INVALID CREDENTIALS</div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Access Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Security Code</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-login">Authorize Login</button>
+        </form>
+        <div class="login-footer">
+            New recruit? <a onclick="triggerSignup()">Request Access (Sign Up)</a>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const emailField = document.getElementById('email');
+            const passwordField = document.getElementById('password');
+            const errorDisplay = document.getElementById('error-msg');
+            const loginCard = document.getElementById('loginCard');
+
+            const email = emailField.value;
+            const password = passwordField.value;
+
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Find user
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                errorDisplay.style.display = 'none';
+                loginCard.classList.remove('shake');
+                localStorage.setItem('currentUserEmail', email);
+                window.location.href = "dashboard.html";
+            } else {
+                // FAIL LOGIC
+                errorDisplay.style.display = 'block';
+
+                // Add shake effect
+                loginCard.classList.remove('shake'); // Reset animation
+                void loginCard.offsetWidth; // Trigger reflow
+                loginCard.classList.add('shake');
+
+                // Clear password for security/retry
+                passwordField.value = '';
+                passwordField.focus();
+            }
+        }
+
+        function triggerSignup() {
+            localStorage.setItem('openSignup', 'true');
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

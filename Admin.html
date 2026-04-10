@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Survival IMOH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ff2e2e;
+            --dark: #0a0a0a;
+            --card: #1a1a1a;
+        }
+
+        body {
+            background: var(--dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: var(--card);
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: var(--red);
+            text-transform: uppercase;
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-save {
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* User Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: left;
+            color: var(--red);
+            padding: 12px;
+            border-bottom: 2px solid #333;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #222;
+        }
+
+        .status-icon {
+            cursor: pointer;
+            font-size: 18px;
+            color: #444;
+        }
+
+            .status-icon.active {
+                color: var(--red);
+                animation: pulse 1.5s infinite;
+            }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Modal for Image View */
+        #imgModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+            #imgModal img {
+                max-width: 90%;
+                max-height: 80%;
+                border: 2px solid var(--red);
+            }
+
+        .close-view {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center; letter-spacing: 3px;">ADMIN <span style="color:var(--red)">COMMAND</span></h1>
+
+    <div class="admin-grid">
+        <div class="panel">
+            <h2>Game Controller</h2>
+            <label>Current Game Name</label>
+            <input type="text" id="editGameName" placeholder="e.g. URBAN SURVIVAL #402">
+
+            <label>Current Game Code</label>
+            <input type="text" id="editGameCode" placeholder="e.g. IMOH-992X">
+
+            <label>Match Timer (Minutes)</label>
+            <input type="number" id="editTimer" placeholder="e.g. 15">
+
+            <button class="btn-save" onclick="updateGame()">Broadcast Changes</button>
+        </div>
+
+        <div class="panel">
+            <h2>User Activity & Payouts</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account Name</th>
+                        <th>Account Number</th>
+                        <th>Proof</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="imgModal">
+        <span class="close-view" onclick="closeImg()">&times;</span>
+        <img id="fullImg" src="">
+    </div>
+
+    <script>
+        function loadAdmin() {
+            // 1. Load Game Settings into inputs
+            document.getElementById('editGameName').value = localStorage.getItem('gName') || "URBAN SURVIVAL #402";
+            document.getElementById('editGameCode').value = localStorage.getItem('gCode') || "IMOH-992X-RED";
+            document.getElementById('editTimer').value = localStorage.getItem('gTimer') || "15";
+
+            // 2. Load REAL Users from LocalStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const table = document.getElementById('userTableBody');
+            table.innerHTML = "";
+
+            if (users.length === 0) {
+                table.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#666;'>No registered users found.</td></tr>";
+            }
+
+            users.forEach((user, index) => {
+                const hasProof = (user.proof && user.proof !== null);
+                table.innerHTML += `
+                    <tr>
+                        <td>${user.fullName || 'Unknown'}</td>
+                        <td>${user.accNumber || 'No Account'}</td>
+                        <td>
+                            <i class="fa-solid fa-file-invoice status-icon ${hasProof ? 'active' : ''}"
+                               onclick="${hasProof ? `viewImage('${user.proof}')` : "alert('No proof uploaded yet')"}">
+                            </i>
+                        </td>
+                        <td>
+                            <button onclick="resetUser('${user.email}')" style="background:#222; border:1px solid #444; color:white; font-size:10px; padding:5px; cursor:pointer;">RESET PROOF</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateGame() {
+            localStorage.setItem('gName', document.getElementById('editGameName').value);
+            localStorage.setItem('gCode', document.getElementById('editGameCode').value);
+            localStorage.setItem('gTimer', document.getElementById('editTimer').value);
+            alert("Broadcast Sent! Changes are live.");
+        }
+
+        function resetUser(email) {
+            let users = JSON.parse(localStorage.getItem('users'));
+            users = users.map(u => {
+                if (u.email === email) u.proof = null;
+                return u;
+            });
+            localStorage.setItem('users', JSON.stringify(users));
+            loadAdmin(); // Refresh table
+        }
+
+        function viewImage(url) {
+            document.getElementById('fullImg').src = url;
+            document.getElementById('imgModal').style.display = 'flex';
+        }
+
+        function closeImg() { document.getElementById('imgModal').style.display = 'none'; }
+
+        window.onload = loadAdmin;
+    </script>
+</body>
+</html>

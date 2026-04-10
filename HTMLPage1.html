@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival IMOH - Landing Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid #333;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 20px;
+            color: #ff2e2e;
+            text-transform: uppercase;
+        }
+
+            .logo span {
+                color: white;
+            }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+            .nav-links li a {
+                text-decoration: none;
+                color: #bbb;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sign, .btn-join {
+            padding: 8px 20px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .btn-sign {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+        }
+
+        .btn-join {
+            background: #ff2e2e;
+            border: none;
+            color: white;
+        }
+
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('WhatsApp Image 2026-04-02 at 1.17.09 PM.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(45px, 12vw, 100px);
+            color: #ff2e2e;
+            margin: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 4000;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border: 1px solid #ff2e2e;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #888;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .signup-form input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">SURVIVAL <span>IMOH</span></div>
+            <ul class="nav-links">
+                <li><a href="#">Download</a></li>
+                <li><a href="#">Tournament</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-sign" onclick="window.location.href='login.html'">Sign in</button>
+                <button class="btn-join" onclick="openModal()">Sign Up</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <div>
+            <h1>SURVIVAL</h1>
+            <h2 style="font-size: 50px;">IMOH</h2>
+        </div>
+    </main>
+
+    <div id="signUpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="text-align:center; color: #ff2e2e;">JOIN THE FIGHT</h2>
+            <form class="signup-form">
+                <input type="text" placeholder="Full Name" required>
+                <input type="email" placeholder="Email Address" required>
+                <button type="submit" style="width:100%; padding:15px; background:#ff2e2e; border:none; color:white; font-weight:bold;">JOIN NOW!!</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("signUpModal").style.display = "flex";
+        }
+        function closeModal() {
+            document.getElementById("signUpModal").style.display = "none";
+        }
+
+        // ONE unified loader
+        window.onload = function () {
+            // Method 1: Check LocalStorage
+            if (localStorage.getItem('openSignup') === 'true') {
+                openModal();
+                localStorage.removeItem('openSignup');
+            }
+
+            // Method 2: Check URL (Backup)
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('signup') === 'true') {
+                openModal();
+            }
+        };
+
+        window.onclick = function (e) {
+            if (e.target == document.getElementById("signUpModal")) closeModal();
+        };
+    </script>
+</body>
+</html>
